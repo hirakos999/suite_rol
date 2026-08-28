@@ -1,0 +1,56 @@
+/* Cable overlay. Sits above the rack but ignores pointer events, so only the
+   cables themselves are clickable and every module control stays reachable. */
+
+.cables {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+  z-index: 50;
+  overflow: visible;
+}
+
+.cable {
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+  /* Cables run right across the panels underneath. If they took pointer
+     events they would swallow clicks meant for knobs and steps, so they are
+     inert: a cable is removed from its jack, not by clicking the cable. */
+  pointer-events: none;
+  /* Slight transparency so overlapping cables still read as separate strands. */
+  opacity: .85;
+  transition: stroke-width .12s, opacity .12s;
+}
+
+/* Highlighted while its jack is hovered, so it is still obvious which cable
+   goes where. */
+.cable.is-lit {
+  stroke-width: 5;
+  opacity: 1;
+  filter: drop-shadow(0 0 6px currentColor);
+}
+
+/* Hidden entirely by the CABLES toggle when they get in the way. */
+body.cables-hidden .cables { display: none; }
+
+.cable-audio { stroke: var(--acid); }
+.cable-cv    { stroke: var(--uv); stroke-dasharray: 7 5; }
+.cable-clock {
+  stroke: var(--amber);
+  stroke-dasharray: 2 5;
+  stroke-width: 2;
+  /* Every module is clocked, so these run across the whole rack. Kept faint so
+     they read as wiring rather than obscuring the panels underneath. */
+  opacity: .38;
+}
+.cable-clock.is-lit { opacity: 1; }
+.cable-midi  { stroke: var(--cyan); }
+
+.cable.is-temp {
+  opacity: .55;
+  stroke-width: 2;
+  stroke-dasharray: 5 5;
+  pointer-events: none;
+}

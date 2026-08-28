@@ -1,0 +1,410 @@
+/* Palette: Berghain concrete + acid-flyer green. Deliberately far from the
+   pastel Roland look — one hot colour against grey and black, nothing else. */
+
+:root {
+  --void:      #0b0b0b;
+  --concrete:  #171717;
+  --panel:     #1e1e1e;
+  --panel-hi:  #272727;
+  --edge:      #333;
+  --edge-soft: #262626;
+
+  --acid:      #c6ff00;
+  --uv:        #ff00c8;
+  --amber:     #ffb000;
+  --cyan:      #00f0ff;
+  --violet:    #a56bff;
+  --blood:     #ff3b30;
+
+  --ink:       #e6e6e6;
+  --ink-dim:   #8a8a8a;
+  --ink-faint: #5a5a5a;
+
+  --mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --r: 2px;
+  --gap: 10px;
+}
+
+body {
+  background: var(--void);
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Fine grid over the whole rack — the concrete floor under everything. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.022) 1px, transparent 1px);
+  background-size: 28px 28px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Scanlines. Suppressed for reduced-motion users along with everything else
+   that flickers. */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg, rgba(0,0,0,.16) 0 1px, transparent 1px 3px
+  );
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  z-index: 9998;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::after { display: none; }
+  * { animation: none !important; transition: none !important; }
+}
+
+/* ---------- boot overlay ---------- */
+
+.boot {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: grid;
+  place-items: center;
+  background: var(--void);
+  transition: opacity .35s ease;
+}
+.boot.is-gone { opacity: 0; pointer-events: none; }
+
+.boot-inner {
+  max-width: 480px;
+  padding: 32px;
+  text-align: left;
+}
+
+.boot-mark {
+  font-size: clamp(48px, 11vw, 96px);
+  font-weight: 800;
+  letter-spacing: -.04em;
+  line-height: .9;
+  color: var(--acid);
+  /* Hard offset shadow, like a badly-registered flyer print. */
+  text-shadow: 4px 4px 0 var(--uv);
+  margin-bottom: 18px;
+}
+
+.boot-copy {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-dim);
+  margin-bottom: 24px;
+  max-width: 38ch;
+}
+
+.boot-btn {
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  padding: 14px 28px;
+  background: var(--acid);
+  color: #000;
+  border: 2px solid var(--acid);
+  transition: background .12s, box-shadow .12s, transform .08s;
+}
+.boot-btn:hover {
+  background: transparent;
+  color: var(--acid);
+  box-shadow: 0 0 24px rgba(198,255,0,.35);
+}
+.boot-btn:active { transform: translateY(1px); }
+
+.boot-list {
+  list-style: none;
+  margin-top: 28px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .1em;
+  color: var(--ink-faint);
+  columns: 2;
+}
+.boot-list li { padding: 3px 0; }
+.boot-list b { color: var(--ink-dim); font-weight: 700; }
+
+/* ---------- top bar ---------- */
+
+.topbar {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  height: 52px;
+  padding: 0 14px;
+  background: var(--concrete);
+  border-bottom: 1px solid var(--edge);
+  flex: 0 0 auto;
+}
+
+.brand { display: flex; align-items: baseline; gap: 2px; }
+.brand-mark {
+  font-weight: 800;
+  font-size: 18px;
+  letter-spacing: -.03em;
+}
+.brand-mark-alt {
+  background: var(--acid);
+  color: #000;
+  padding: 0 5px;
+}
+
+.topbar-transport {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-right: auto;
+  margin-left: 24px;
+}
+
+.transport-btn {
+  width: 38px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  background: var(--panel-hi);
+  border: 1px solid var(--edge);
+  color: var(--ink-dim);
+  transition: all .12s;
+}
+.transport-btn:hover { border-color: var(--acid); color: var(--acid); }
+.transport-btn.is-running {
+  background: var(--acid);
+  border-color: var(--acid);
+  color: #000;
+}
+
+.master {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.master input[type=range] { width: 90px; }
+
+.topbar-actions { display: flex; gap: 6px; }
+
+/* ---------- rack ---------- */
+
+/* The scroll container and the cable layer's coordinate space. */
+.rack-area {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 auto;
+  overflow: auto;
+  padding: var(--gap);
+}
+
+/* The clock sits alone across the top, centred — it drives everything below,
+   so it reads as the head of the rack rather than one voice among six. */
+.clock-slot {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--gap);
+}
+.clock-slot > .panel {
+  width: min(100%, 1240px);
+}
+
+/* Five voices side by side in one row of columns. */
+.rack {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--gap);
+  align-items: start;
+}
+
+@media (max-width: 1500px) {
+  .rack { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 980px) {
+  .rack { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* ---------- status bar ---------- */
+
+.statusbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 26px;
+  padding: 0 12px;
+  background: var(--concrete);
+  border-top: 1px solid var(--edge);
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink-dim);
+  flex: 0 0 auto;
+  position: relative;
+  z-index: 10;
+}
+
+.status-dot {
+  width: 6px; height: 6px;
+  background: var(--ink-faint);
+  border-radius: 50%;
+}
+body.is-running .status-dot {
+  background: var(--acid);
+  box-shadow: 0 0 8px var(--acid);
+}
+
+.status-hint {
+  margin-left: auto;
+  color: var(--ink-faint);
+}
+
+@media (max-width: 720px) {
+  .status-hint { display: none; }
+  .rack { grid-template-columns: 1fr; }
+}
+
+/* ---------- recorder ---------- */
+
+.rec-group {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.btn-rec {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rec-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ink-faint);
+}
+
+.btn-rec.is-recording {
+  border-color: var(--blood);
+  color: var(--blood);
+}
+.btn-rec.is-recording .rec-dot {
+  background: var(--blood);
+  box-shadow: 0 0 8px var(--blood);
+  animation: rec-blink 1s steps(2) infinite;
+}
+
+@keyframes rec-blink { 50% { opacity: .25; } }
+
+.rec-time {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink-dim);
+  font-variant-numeric: tabular-nums;
+  min-width: 30px;
+}
+
+/* A thin red frame while recording, so it is obvious from anywhere on screen. */
+body.is-recording .rack-area {
+  box-shadow: inset 0 0 0 1px var(--blood);
+}
+
+#clear-all.is-armed {
+  background: var(--blood);
+  border-color: var(--blood);
+  color: #000;
+}
+
+
+/* ---------- help overlay ---------- */
+
+.help {
+  position: fixed;
+  inset: 0;
+  z-index: 9990;
+  display: none;
+  background: rgba(0, 0, 0, .8);
+  backdrop-filter: blur(3px);
+  padding: 40px 20px;
+  overflow: auto;
+}
+.help.is-open { display: block; }
+
+.help-inner {
+  max-width: 860px;
+  margin: 0 auto;
+  background: var(--panel);
+  border: 1px solid var(--acid);
+  box-shadow: 0 0 60px rgba(0, 0, 0, .8);
+}
+
+.help-head {
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: var(--concrete);
+  border-bottom: 1px solid var(--edge);
+}
+.help-head h2 {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: .04em;
+  color: var(--acid);
+}
+
+.help-body { padding: 6px 18px 22px; }
+
+.help-section { padding: 16px 0; border-bottom: 1px solid var(--edge-soft); }
+.help-section:last-child { border-bottom: none; }
+
+.help-section h3 {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .2em;
+  color: var(--amber);
+  margin-bottom: 10px;
+}
+
+.help-section dl {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  gap: 7px 16px;
+}
+.help-section dt {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: .04em;
+}
+.help-section dd {
+  font-size: 12px;
+  color: var(--ink-dim);
+  line-height: 1.5;
+}
+
+@media (max-width: 620px) {
+  .help-section dl { grid-template-columns: 1fr; gap: 2px 0; }
+  .help-section dd { margin-bottom: 8px; }
+}
+
+/* Outline rather than fill: .btn.is-active paints the background acid, which
+   would put acid text on an acid button. */
+#cables-btn.is-active {
+  background: transparent;
+  color: var(--acid);
+  border-color: var(--acid);
+}

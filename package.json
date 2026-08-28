@@ -1,0 +1,20 @@
+{
+  "name": "suite-rol",
+  "version": "0.2.0",
+  "description": "Six-module patchable synth rack — Web Audio, no build step",
+  "type": "module",
+  "scripts": {
+    "dev": "node server/index.js",
+    "start": "node server/index.js",
+    "test": "node test/smoke.mjs",
+    "test:ui": "node test/run-ui.mjs",
+    "test:audio": "node test/run-audio.mjs",
+    "test:all": "npm test && npm run test:audio && npm run test:ui"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "jsdom": "^24.0.0"
+  }
+}

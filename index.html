@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SUITE ROL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/reset.css">
+<link rel="stylesheet" href="css/theme.css">
+<link rel="stylesheet" href="css/controls.css">
+<link rel="stylesheet" href="css/panel.css">
+<link rel="stylesheet" href="css/patch.css">
+</head>
+<body>
+
+<div class="boot" id="boot">
+  <div class="boot-inner">
+    <div class="boot-mark">SUITE&nbsp;ROL</div>
+    <p class="boot-copy">Six-module rack. Patch it yourself — nothing syncs until you cable it.</p>
+    <button class="boot-btn" id="boot-btn">POWER ON</button>
+    <ul class="boot-list">
+      <li><b>KANCHELSKIS</b> clock / patterns</li>
+      <li><b>YEBOAH</b> rhythm / acid</li>
+      <li><b>JUNINHO</b> tweak synth</li>
+      <li><b>LE TISSIER</b> chord engine</li>
+      <li><b>ASPRILLA</b> sample deck</li>
+      <li><b>ZOLA</b> voice lab</li>
+    </ul>
+  </div>
+</div>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark">SUITE</span><span class="brand-mark brand-mark-alt">ROL</span>
+  </div>
+
+  <div class="topbar-transport">
+    <button class="transport-btn" id="transport" title="Play / stop (space)">▶</button>
+    <div class="master">
+      <label class="micro-label" for="master-vol">MASTER</label>
+      <input type="range" id="master-vol" min="0" max="1" step="0.01" value="0.8">
+      <div id="master-meter"></div>
+    </div>
+  </div>
+
+  <div class="rec-group">
+    <button class="btn btn-rec" id="rec" title="record the master bus to WAV">
+      <span class="rec-dot"></span>REC
+    </button>
+    <select class="select select-mini" id="rec-mode" title="recording length mode">
+      <option value="free">LIVE</option>
+      <option value="bars" selected>BARS</option>
+      <option value="seconds">SECS</option>
+    </select>
+    <select class="select select-mini" id="rec-amount"></select>
+    <span class="rec-time" id="rec-time">0:00</span>
+  </div>
+
+  <div class="topbar-actions">
+    <button class="btn btn-ghost" id="help-btn" title="how everything works (?)">? HELP</button>
+    <button class="btn btn-ghost is-active" id="cables-btn" title="show or hide the patch cables">CABLES</button>
+    <button class="btn btn-ghost" id="export-patch">EXPORT</button>
+    <label class="btn btn-ghost">
+      IMPORT<input type="file" id="import-patch" accept=".json" hidden>
+    </label>
+    <button class="btn btn-ghost btn-danger" id="clear-all">CLEAR</button>
+    <button class="btn btn-ghost btn-danger" id="panic">PANIC</button>
+  </div>
+</header>
+
+<div class="rack-area" id="rack-area">
+  <div class="clock-slot" id="clock-slot"></div>
+  <main class="rack" id="rack"></main>
+  <svg class="cables" id="cables" xmlns="http://www.w3.org/2000/svg"></svg>
+</div>
+
+<footer class="statusbar">
+  <span class="status-dot"></span>
+  <span id="status">ready</span>
+  <span class="status-hint">drag jack → jack to patch · right-click a jack to unplug · right-click a step to edit · press ? for help</span>
+</footer>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>audio test</title></head>
+<body>
+<pre id="out">running…</pre>
+
+<script>
+// Surface every failure in the DOM — headless has no console to read.
+window.addEventListener('error', (e) => {
+  document.getElementById('out').textContent += `\n\nERROR: ${e.message}\n${e.filename}:${e.lineno}\n${e.error?.stack || ''}`;
+  document.title = 'done';
+});
+window.addEventListener('unhandledrejection', (e) => {
+  document.getElementById('out').textContent += `\n\nREJECTION: ${e.reason?.message || e.reason}\n${e.reason?.stack || ''}`;
+  document.title = 'done';
+});
+</script>
+<script type="module">
+// Renders each module offline and measures its actual output level.
+// This is the only honest way to answer "does this module make sound" without
+// listening to it.
+//
+// Open with Chrome headless + --dump-dom and read the <pre>.
+
+import { initAudio, getCtx, getMaster, _resetAudio } from '../js/core/audio-engine.js';
+import { Clock } from '../js/core/clock.js';
+import { PatchGraph } from '../js/core/patch-graph.js';
+import { PatternBank } from '../js/core/patterns.js';
+
+import { Kanchelskis } from '../js/modules/kanchelskis.js';
+import { Yeboah } from '../js/modules/yeboah.js';
+import { Juninho } from '../js/modules/juninho.js';
+import { LeTissier } from '../js/modules/letissier.js';
+import { Asprilla } from '../js/modules/asprilla.js';
+import { Zola } from '../js/modules/zola.js';
+
+const lines = [];
+const log = (s) => { lines.push(s); document.getElementById('out').textContent = lines.join('\n'); };
+
+const SECONDS = 4;
+const RATE = 44100;
+
+function analyse(buffer) {
+  const d = buffer.getChannelData(0);
+  let sum = 0, peak = 0;
+  for (let i = 0; i < d.length; i++) {
+    const v = Math.abs(d[i]);
+    sum += d[i] * d[i];
+    if (v > peak) peak = v;
+  }
+  return { rms: Math.sqrt(sum / d.length), peak };
+}
+
+// Runs one module alone, clocked, for SECONDS, and returns its level.
+async function renderModule(name, Factory, { patchClock = true, extra = null } = {}) {
+  _resetAudio();
+  const offline = new OfflineAudioContext(2, RATE * SECONDS, RATE);
+  initAudio({ context: offline });
+
+  const clock = new Clock(offline, { bpm: 130 });
+  const graph = new PatchGraph();
+
+  const mod = Factory({ clock });
+  graph.register(mod);
+  mod.render();
+
+  if (extra) await extra(mod, graph);
+
+  // Schedule the whole render up front: an OfflineAudioContext has no wall
+  // clock, so the lookahead scheduler cannot drive it.
+  if (patchClock) {
+    const steps = Math.floor(SECONDS / clock.stepDuration);
+    const handler = mod.getJack('clk-in')?.node.handler;
+    for (let s = 0; s < steps; s++) {
+      const t = s * clock.stepDuration + 0.05;
+      try { handler?.(s, t); } catch (err) { log(`  !! ${name} threw at step ${s}: ${err.message}`); break; }
+    }
+  }
+
+  const rendered = await offline.startRendering();
+  return analyse(rendered);
+}
+
+const results = [];
+const check = (name, res, minRms = 0.001) => {
+  const ok = res.rms > minRms;
+  results.push(ok);
+  log(`${ok ? '  ok  ' : ' SILENT '} ${name.padEnd(22)} rms=${res.rms.toFixed(5)} peak=${res.peak.toFixed(4)}`);
+};
+
+log('SUITE ROL — offline audio render test\n');
+
+check('YEBOAH (drums+303)', await renderModule('yeboah', (o) => new Yeboah(o)));
+check('JUNINHO (synth)', await renderModule('juninho', (o) => new Juninho(o)));
+check('LE TISSIER (chords)', await renderModule('letissier', (o) => new LeTissier(o)));
+check('ASPRILLA (kit pads)', await renderModule('asprilla', (o) => {
+  const m = new Asprilla(o);
+  // Seed a pattern so the pads actually fire.
+  m.pattern.p0 = Array.from({ length: 16 }, (_, i) => (i % 4 === 0 ? { velocity: 1 } : null));
+  return m;
+}));
+check('ZOLA (vowel+vocoder)', await renderModule('zola', (o) => new Zola(o)));
+
+// ZOLA with the vocoder bypassed, to separate "vowel synth is silent" from
+// "vocoder eats the signal".
+check('ZOLA bypass (raw vowel)', await renderModule('zola-bypass', (o) => {
+  const m = new Zola(o);
+  m.bypassGain.gain.value = 1;
+  m.vocoder.output.gain.value = 0;
+  return m;
+}));
+
+// A patched CV cable must not silence the target module.
+check('YEBOAH + CV patched', await renderModule('yeboah-cv', (o) => new Yeboah(o), {
+  extra: async (mod, graph) => {
+    const src = new Juninho({ clock: mod.clock });
+    graph.register(src);
+    src.render();
+    graph.connect(src.getJack('audio-out'), mod.getJack('cutoff-cv'));
+    mod.updateNormalisation(graph);
+  }
+}));
+
+log('');
+log(results.every(Boolean) ? 'ALL AUDIBLE' : `${results.filter((r) => !r).length} SILENT`);
+document.title = 'done';
+</script>
+</body>
+</html>

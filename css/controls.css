@@ -1,0 +1,659 @@
+/* Knobs, buttons, selects, step grids, displays, meters. */
+
+.micro-label {
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: .14em;
+  color: var(--ink-faint);
+  text-transform: uppercase;
+}
+
+/* ---------- knob ---------- */
+
+.knob {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  user-select: none;
+}
+
+.knob-dial {
+  position: relative;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 34% 30%, #3a3a3a 0%, #202020 55%, #141414 100%);
+  border: 1px solid var(--edge);
+  cursor: ns-resize;
+  touch-action: none;
+  transition: border-color .12s, box-shadow .12s;
+}
+.knob-dial:hover { border-color: var(--ink-faint); }
+.knob-dial.is-dragging {
+  border-color: var(--accent, var(--acid));
+  box-shadow: 0 0 12px rgba(198,255,0,.25);
+}
+
+/* The line marking the knob's position. */
+.knob-pointer {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 2px;
+  height: 38%;
+  background: var(--accent, var(--acid));
+  transform-origin: 50% 100%;
+  border-radius: 1px;
+}
+
+.knob-arc {
+  position: absolute;
+  inset: -4px;
+  width: calc(100% + 8px);
+  height: calc(100% + 8px);
+  pointer-events: none;
+}
+.knob-arc-track {
+  fill: none;
+  stroke: rgba(255,255,255,.08);
+  stroke-width: 4;
+  stroke-linecap: butt;
+}
+.knob-arc-fill {
+  fill: none;
+  stroke: var(--accent, var(--acid));
+  stroke-width: 4;
+  stroke-linecap: butt;
+  opacity: .8;
+}
+
+.knob-label {
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: .1em;
+  color: var(--ink-faint);
+  text-transform: uppercase;
+}
+.knob-readout {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--ink-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.knob-cluster {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ---------- buttons ---------- */
+
+.btn {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  padding: 6px 10px;
+  background: var(--panel-hi);
+  border: 1px solid var(--edge);
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  transition: all .1s;
+  white-space: nowrap;
+}
+.btn:hover { border-color: var(--ink-faint); color: var(--ink); }
+.btn:active { transform: translateY(1px); }
+
+.btn.is-active {
+  background: var(--accent, var(--acid));
+  border-color: var(--accent, var(--acid));
+  color: #000;
+}
+
+.btn-primary {
+  background: var(--accent, var(--acid));
+  border-color: var(--accent, var(--acid));
+  color: #000;
+}
+.btn-primary:hover { filter: brightness(1.15); color: #000; }
+
+.btn-large { padding: 9px 16px; font-size: 10px; }
+
+.btn-ghost {
+  background: transparent;
+  font-size: 9px;
+}
+
+.btn-danger:hover {
+  border-color: var(--blood);
+  color: var(--blood);
+}
+
+.btn-play.is-active {
+  background: var(--acid);
+  border-color: var(--acid);
+}
+
+.button-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* ---------- select / inputs ---------- */
+
+.select {
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 5px 8px;
+  background: var(--void);
+  border: 1px solid var(--edge);
+  color: var(--ink);
+  min-width: 74px;
+  cursor: pointer;
+}
+.select:hover { border-color: var(--ink-faint); }
+.select option { background: var(--panel); }
+
+.stacked {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.text-input {
+  flex: 1;
+  min-width: 140px;
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 7px 9px;
+  background: var(--void);
+  border: 1px solid var(--edge);
+  color: var(--ink);
+}
+.text-input:focus { border-color: var(--accent, var(--acid)); }
+.text-input::placeholder { color: var(--ink-faint); }
+
+.file-input {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--ink-faint);
+  max-width: 190px;
+}
+.file-input::file-selector-button {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: .08em;
+  padding: 5px 9px;
+  margin-right: 8px;
+  background: var(--panel-hi);
+  border: 1px solid var(--edge);
+  color: var(--ink-dim);
+  cursor: pointer;
+  text-transform: uppercase;
+}
+.file-input::file-selector-button:hover { border-color: var(--accent, var(--acid)); }
+
+input[type=range] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 3px;
+  background: var(--edge);
+  cursor: pointer;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 10px;
+  height: 16px;
+  background: var(--acid);
+  border-radius: 1px;
+}
+input[type=range]::-moz-range-thumb {
+  width: 10px;
+  height: 16px;
+  background: var(--acid);
+  border: none;
+  border-radius: 1px;
+}
+
+/* ---------- readouts ---------- */
+
+.readout {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--accent, var(--acid));
+  letter-spacing: .06em;
+  align-self: center;
+}
+.readout-large { font-size: 15px; font-weight: 700; }
+
+.readout-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  justify-content: center;
+}
+
+/* ---------- seven-segment display ---------- */
+
+.display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.seg-screen {
+  display: flex;
+  gap: 3px;
+  padding: 6px 8px;
+  background: #0a0505;
+  border: 1px solid var(--edge);
+  box-shadow: inset 0 0 12px rgba(255,0,0,.08);
+}
+
+.seg-digit {
+  position: relative;
+  width: 15px;
+  height: 26px;
+}
+
+.seg {
+  position: absolute;
+  background: rgba(255, 40, 20, .045);
+  transition: background .05s, box-shadow .05s;
+}
+.seg.on {
+  background: #ff2810;
+  box-shadow: 0 0 6px rgba(255,40,16,.7);
+}
+
+/* Seven-segment geometry: three horizontals, four verticals. */
+.seg-a { top: 0;              left: 2px;  right: 2px; height: 2.5px; }
+.seg-g { top: 50%;            left: 2px;  right: 2px; height: 2.5px; transform: translateY(-50%); }
+.seg-d { bottom: 0;           left: 2px;  right: 2px; height: 2.5px; }
+.seg-f { top: 2px;            left: 0;    width: 2.5px; height: calc(50% - 3px); }
+.seg-b { top: 2px;            right: 0;   width: 2.5px; height: calc(50% - 3px); }
+.seg-e { bottom: 2px;         left: 0;    width: 2.5px; height: calc(50% - 3px); }
+.seg-c { bottom: 2px;         right: 0;   width: 2.5px; height: calc(50% - 3px); }
+
+.display-label {
+  font-family: var(--mono);
+  font-size: 7px;
+  letter-spacing: .16em;
+  color: var(--ink-faint);
+}
+
+/* ---------- beat LED ---------- */
+
+.beat-led {
+  width: 14px;
+  height: 14px;
+  align-self: center;
+  background: rgba(255,255,255,.06);
+  border: 1px solid var(--edge);
+  border-radius: 50%;
+  transition: background .04s, box-shadow .04s;
+}
+.beat-led.is-lit {
+  background: var(--amber);
+  box-shadow: 0 0 12px var(--amber);
+}
+.beat-led.is-lit.is-bar {
+  background: var(--acid);
+  box-shadow: 0 0 14px var(--acid);
+}
+
+.clock-readouts {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+/* ---------- step grid ---------- */
+
+.step-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+}
+
+.grid-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.grid-row-label {
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: .08em;
+  color: var(--ink-faint);
+  width: 26px;
+  flex: 0 0 26px;
+  text-align: right;
+  text-transform: uppercase;
+}
+
+.grid-cells, .grid-ruler {
+  display: grid;
+  grid-template-columns: repeat(var(--steps, 16), 1fr);
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+  /* Keeps the row from sprawling on a double-width panel. */
+  max-width: 520px;
+}
+
+.ruler-tick {
+  font-family: var(--mono);
+  font-size: 7px;
+  color: var(--ink-faint);
+  text-align: center;
+  height: 9px;
+  line-height: 9px;
+  border-bottom: 1px solid transparent;
+}
+.ruler-tick.is-beat { color: var(--ink-dim); }
+.ruler-tick.is-playing { border-bottom-color: var(--acid); color: var(--acid); }
+
+/* One LED per step. Brightness carries velocity, so a pattern reads at a
+   glance the way a hardware step row does. */
+/* Square LEDs centred in their column: on a wide panel the columns get roomy,
+   but the pads themselves stay step-sized instead of stretching into slabs. */
+.step-cell {
+  --step-vel: 0;
+  position: relative;
+  aspect-ratio: 1;
+  width: 100%;
+  max-width: 24px;
+  justify-self: center;
+  background: rgba(255,255,255,.045);
+  border: 1px solid transparent;
+  transition: background .06s, box-shadow .06s;
+}
+.step-cell.is-downbeat { background: rgba(255,255,255,.085); }
+.step-cell:hover { border-color: var(--ink-faint); }
+
+.step-cell.is-on {
+  background: color-mix(in srgb, var(--step-color, var(--acid)) calc(var(--step-vel) * 100%), transparent);
+  box-shadow: 0 0 calc(var(--step-vel) * 8px) color-mix(in srgb, var(--step-color, var(--acid)) 55%, transparent);
+}
+
+/* Accent = white core; slide = a bar across the bottom. */
+.step-cell.is-accent::after {
+  content: '';
+  position: absolute;
+  inset: 30%;
+  background: #fff;
+}
+.step-cell.is-slide::before {
+  content: '';
+  position: absolute;
+  left: 1px; right: 1px; bottom: 1px;
+  height: 2px;
+  background: var(--cyan);
+}
+
+.step-cell.is-playing {
+  border-color: #fff;
+  box-shadow: 0 0 8px rgba(255,255,255,.5);
+}
+
+.step-grid.is-compact .step-cell { max-width: 18px; }
+
+/* ---------- pads ---------- */
+
+.pad-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 4px;
+  width: 100%;
+}
+
+.pad {
+  position: relative;
+  aspect-ratio: 1;
+  background: var(--panel-hi);
+  border: 1px solid var(--edge);
+  transition: all .07s;
+}
+.pad:hover { border-color: var(--ink-faint); }
+.pad.is-loaded { border-color: color-mix(in srgb, var(--accent) 45%, transparent); }
+.pad.is-selected { border-color: var(--accent); }
+.pad.is-hit {
+  background: var(--accent);
+  box-shadow: 0 0 14px var(--accent);
+}
+
+.pad-index {
+  position: absolute;
+  top: 2px; left: 3px;
+  font-family: var(--mono);
+  font-size: 7px;
+  color: var(--ink-faint);
+}
+.pad.is-hit .pad-index { color: #000; }
+
+/* ---------- chord slots ---------- */
+
+.chord-slots {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 3px;
+  width: 100%;
+}
+
+.chord-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 2px;
+  background: var(--panel-hi);
+  border: 1px solid var(--edge);
+  transition: all .1s;
+}
+.chord-slot:hover { border-color: var(--ink-faint); }
+.chord-slot.is-filled { border-color: color-mix(in srgb, var(--accent) 40%, transparent); }
+.chord-slot.is-selected { border-color: var(--accent); background: rgba(255,255,255,.05); }
+.chord-slot.is-playing {
+  background: var(--accent);
+  box-shadow: 0 0 12px var(--accent);
+}
+
+.chord-slot-index {
+  font-family: var(--mono);
+  font-size: 7px;
+  color: var(--ink-faint);
+}
+.chord-slot-name {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.chord-slot.is-playing .chord-slot-index,
+.chord-slot.is-playing .chord-slot-name { color: #000; }
+
+/* ---------- waveform / dropzone ---------- */
+
+.dropzone {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 8px;
+  background: var(--void);
+  border: 1px dashed var(--edge);
+  transition: border-color .12s, background .12s;
+}
+.dropzone.is-over {
+  border-color: var(--accent);
+  background: rgba(255,255,255,.03);
+}
+
+.waveform {
+  width: 100%;
+  height: 68px;
+  background: #060606;
+}
+
+/* ---------- VU ---------- */
+
+.vu { image-rendering: pixelated; }
+
+/* Disabled control groups stay visible but read as inert. */
+.is-disabled {
+  opacity: .35;
+  pointer-events: none;
+}
+
+/* ---------- pattern bank ---------- */
+
+.pattern-slots {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+  max-width: 320px;
+}
+
+.pattern-slot {
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  background: var(--panel-hi);
+  border: 1px solid var(--edge);
+  transition: all .1s;
+}
+.pattern-slot:hover { border-color: var(--ink-faint); }
+.pattern-slot.is-filled {
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  background: color-mix(in srgb, var(--accent) 12%, var(--panel-hi));
+}
+.pattern-slot.is-current {
+  border-color: var(--accent);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+.pattern-slot-name {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-dim);
+}
+.pattern-slot.is-filled .pattern-slot-name { color: var(--accent); }
+
+/* ---------- song list ---------- */
+
+.song-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.song-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 5px;
+  background: var(--void);
+  border: 1px solid var(--edge);
+}
+.song-item.is-playing {
+  border-color: var(--accent);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+.song-slot {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  min-width: 12px;
+}
+
+.song-repeats {
+  width: 34px;
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 2px 3px;
+  background: var(--panel-hi);
+  border: 1px solid var(--edge);
+  color: var(--ink);
+}
+
+/* ---------- small buttons / groups ---------- */
+
+.btn-mini {
+  padding: 3px 6px;
+  font-size: 8px;
+  min-width: 20px;
+}
+.btn-mini.is-dim { opacity: .3; }
+
+.btn-group {
+  display: flex;
+  gap: 2px;
+}
+
+.button-stack-h {
+  display: flex;
+  gap: 4px;
+}
+
+.select-mini {
+  min-width: 62px;
+  padding: 4px 5px;
+  font-size: 9px;
+}
+
+/* ---------- jack extras ---------- */
+
+/* The attenuverter that sits under every CV input. */
+.knob-mini .knob-label,
+.knob-mini .knob-readout { font-size: 7px; }
+.knob-mini .knob-arc { inset: -3px; width: calc(100% + 6px); height: calc(100% + 6px); }
+.knob-mini .knob-arc-track,
+.knob-mini .knob-arc-fill { stroke-width: 6; }
+
+.dir-toggle {
+  font-family: var(--mono);
+  font-size: 7px;
+  letter-spacing: .06em;
+  padding: 1px 4px;
+  background: var(--panel-hi);
+  border: 1px solid var(--edge);
+  color: var(--ink-faint);
+}
+.dir-toggle.is-active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #000;
+}
+
+/* Steps outside a track's length: visible, but clearly not part of it. */
+.step-cell.is-out {
+  background: rgba(255,255,255,.015);
+  border-color: transparent;
+  cursor: default;
+  opacity: .4;
+}
+
+.pad-name {
+  position: absolute;
+  bottom: 2px;
+  left: 0; right: 0;
+  font-family: var(--mono);
+  font-size: 6px;
+  color: var(--ink-faint);
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pad.is-hit .pad-name { color: #000; }
